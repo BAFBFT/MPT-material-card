@@ -2,6 +2,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# dataset and model params:
+full_data = pd.read_csv("Constant Strain Rate Data.csv")
+epsT = np.array(full_data["Strain"], dtype=float)
+
+params_by_temp = {
+    "200": dict(E=30000.0, k=50.0, K=200.0, n1=1.0, A=5.0, C=0.5, n2=1.5, B=200.0),
+    "250": dict(E=28000.0, k=45.0, K=210.0, n1=1.0, A=4.5, C=0.6, n2=1.5, B=190.0),
+    "300": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0),
+    "350": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0),
+    "400": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0),
+    "450": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0),
+    "500": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0),
+    "535": dict(E=26000.0, k=40.0, K=220.0, n1=1.0, A=4.0, C=0.7, n2=1.5, B=180.0)
+}
+
 def simulate_sigma_euler(
     epsT: np.ndarray,          # true strain array (monotonic increasing)
     SR: float,                 # strain rate (1/s)
@@ -21,6 +36,7 @@ def simulate_sigma_euler(
 
     # ensure epsT is np.array
     epsT = np.asarray(epsT, dtype=float)
+
     # number of sigma values to generate
     N = len(epsT)
 
@@ -80,11 +96,12 @@ def simulate_sigma_euler(
 
     return sigma, eps_p, rho, R
 
-## TODO: add least squares scheme to minimise error.
+## TODO: need to see the results of the parameters 
+# can we do a dictionary of dictionaries, each mapping temperatures to params
+# would that be too complicated?
 
 if __name__ == "__main__":
-    full_data = pd.read_csv("Constant Strain Rate Data.csv")
-    epsT = np.array(full_data["Strain"], dtype=float)
+
     SR = 1.0  # set strain rate
     temps = [c for c in full_data.columns if c != "Strain"]
 
@@ -96,16 +113,7 @@ if __name__ == "__main__":
         epsT = full_data["Strain"].to_numpy()[mask]
         sigma_exp = sigma_exp[mask]
 
-        params_guess = dict(
-            E=30000.0,   # MPa 
-            k=50.0,      # MPa
-            K=200.0,     # MPa (bigger K => gentler plastic onset)
-            n1=1.0,      
-            A=5.0,
-            C=0.5,
-            n2=1.5,      # not temperature dependent (how do we estimate it??)
-            B=200.0      # MPa
-        )
+        params_guess = params_by_temp[col]
 
         sigma_model, eps_p_hist, rho_hist, R_hist = simulate_sigma_euler(
             epsT=epsT,
