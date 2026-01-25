@@ -99,7 +99,7 @@ def simulate_sigma_euler(
 ## TODO: need to see the results of the parameters 
 # can we do a dictionary of dictionaries, each mapping temperatures to params
 # would that be too complicated?
-
+# what are the different ways in which we can
 if __name__ == "__main__":
 
     SR = 1.0  # set strain rate
@@ -125,5 +125,5 @@ if __name__ == "__main__":
 
         plt.title(f"Simulation and experiment plot for {col}°C")
         plt.plot(epsT, sigma_model)
-        plt.scatter(epsT, sigma_exp)
+        plt.scatter(epsT, sigma_exp, size=3, c='r')
         plt.show()
